@@ -33,8 +33,18 @@ headers = {"Authorization": "Bearer " + token,  # OAuth-токен. Исполь
 
 # Создание тела запроса
 body = {"method": "get",  # Используемый метод.
-        "params": {"SelectionCriteria": {},  # Критерий отбора кампаний. Для получения всех кампаний должен быть пустым
-                   "FieldNames": ["Id", "Name", "StartDate", "State", "Status", "StatusPayment", "Funds"]  # Имена параметров, которые требуется получить.
+        "params": {"SelectionCriteria": {
+                        "Types": [( "TEXT_CAMPAIGN" ),],
+                   },
+                   "FieldNames": ["Id",
+                                  "Name",
+                                  "StartDate",
+                                  "State",
+                                  "Status",
+                                  "StatusPayment",
+                                #  "Funds",
+                                ],
+                   "TextCampaignFieldNames": [("BiddingStrategy" ),],
                    }}
 
 # Кодирование тела запроса в JSON
@@ -62,9 +72,15 @@ try:
         print("Информация о баллах: {}".format(result.headers.get("Units", False)))
         # Вывод списка кампаний
         for campaign in result.json()["result"]["Campaigns"]:
-            print("Рекламная кампания: {} №{}, active from {}, state {}, status {}, StatusPayment {}, Funds {}".format(
-                u(campaign['Name']), campaign['Id'], campaign['StartDate'],
-                campaign['State'], campaign['Status'], campaign['StatusPayment'], campaign['Funds'],
+            print("Рекламная кампания: {} №{}, active from {}, state {}, status {}, StatusPayment {}, {}".format(
+                u(campaign['Name']),
+                campaign['Id'],
+                campaign['StartDate'],
+                campaign['State'],
+                campaign['Status'],
+                campaign['StatusPayment'],
+                campaign['TextCampaign']['BiddingStrategy'],
+              #  campaign['Funds'],
             ))
 
         if result.json()['result'].get('LimitedBy', False):

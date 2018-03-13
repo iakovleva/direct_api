@@ -19,75 +19,82 @@ else:
         else:
             return x
 
-# --- Входные данные ---
-#  Адрес сервиса Keywords для отправки JSON-запросов (регистрозависимый)
-CampaignsURL = 'https://api-sandbox.direct.yandex.com/json/v5/keywords'
+def get_kw_list(LimitedBy = 0, kw_list = []):
 
-# --- Подготовка, выполнение и обработка запроса ---
-#  Создание HTTP-заголовков запроса
-headers = {"Authorization": "Bearer " + token,  # OAuth-токен. Использование слова Bearer обязательно
-           "Accept-Language": "ru",  # Язык ответных сообщений
-           }
+    # --- Входные данные ---
+    #  Адрес сервиса Keywords для отправки JSON-запросов (регистрозависимый)
 
-# Создание тела запроса
-body = {"method": "get",  # Используемый метод.
-        "params": {"SelectionCriteria": {
-                        "CampaignIds":["258015", "258016", "258017"],
-                        },
-                   "FieldNames": [
-                        "Id", "Keyword", "Status", "State", "AdGroupId", "CampaignId", "Bid",
-                        ],  # Имена параметров, которые требуется получить.
-                  },
-        }
+    #CampaignsURL = 'https://api-sandbox.direct.yandex.com/json/v5/keywords'
+    CampaignsURL = 'https://api.direct.yandex.com/json/v5/keywords'
 
-# Кодирование тела запроса в JSON
-jsonBody = json.dumps(body, ensure_ascii=False).encode('utf8')
-
-# Выполнение запроса
-try:
-    result = requests.post(CampaignsURL, jsonBody, headers=headers)
-
-    # Отладочная информация
-    # print("Заголовки запроса: {}".format(result.request.headers))
-    # print("Запрос: {}".format(u(result.request.body)))
-    # print("Заголовки ответа: {}".format(result.headers))
-    # print("Ответ: {}".format(u(result.text)))
-    # print("\n")
-
-    # Обработка запроса
-    if result.status_code != 200 or result.json().get("error", False):
-        print("Произошла ошибка при обращении к серверу API Директа.")
-        print("Код ошибки: {}".format(result.json()["error"]["error_code"]))
-        print("Описание ошибки: {}".format(u(result.json()["error"]["error_detail"])))
-        print("RequestId: {}".format(result.headers.get("RequestId", False)))
-    else:
-#        print("RequestId: {}".format(result.headers.get("RequestId", False)))
-#        print("Информация о баллах: {}".format(result.headers.get("Units", False)))
-# Put all keywords in 1 list
-        kw_list = []
-        for campaign in result.json()["result"]["Keywords"]:
-            kw_list.append(campaign['Keyword'])
-# Вывод списка кампаний
-            print("Keyword: {}, status {}, State {}, AdGroupId {}, CampaignId {}, Bid {}".format(
-                campaign['Keyword'], campaign['Status'], campaign['State'],
-                campaign['AdGroupId'], campaign["CampaignId"], campaign['Bid'],
-            ))
-        print(len(kw_list))
-        print(len(set(kw_list)))
-
-        if result.json()['result'].get('LimitedBy', False):
-            # Если ответ содержит параметр LimitedBy, значит,  были получены не все доступные объекты.
-            # В этом случае следует выполнить дополнительные запросы для получения всех объектов.
-            # Подробное описание постраничной выборки - https://tech.yandex.ru/direct/doc/dg/best-practice/get-docpage/#page
-            print("Получены не все доступные объекты.")
+    # --- Подготовка, выполнение и обработка запроса ---
+    #  Создание HTTP-заголовков запроса
+    headers = {"Authorization": "Bearer " + token,  # OAuth-токен. Использование слова Bearer обязательно
+               "Accept-Language": "ru",  # Язык ответных сообщений
+               }
 
 
-# Обработка ошибки, если не удалось соединиться с сервером API Директа
-except ConnectionError:
-    # В данном случае мы рекомендуем повторить запрос позднее
-    print("Произошла ошибка соединения с сервером API.")
+    # Создание тела запроса
+    body = {"method": "get",  # Используемый метод.
+            "params": {"SelectionCriteria": {
+                            "CampaignIds":[""],
+                            },
+                       "FieldNames": [
+                            "Id", "Keyword", "Status", "State", "AdGroupId", "CampaignId", "Bid",
+                            ],  # Имена параметров, которые требуется получить.
+                        "Page": {
+    #                       "Limit": (long),
+                            "Offset": (LimitedBy)
+                        }
+                      },
+            }
 
-# Если возникла какая-либо другая ошибка
-except:
-    # В данном случае мы рекомендуем проанализировать действия приложения
-    print("Произошла непредвиденная ошибка.")
+    # Кодирование тела запроса в JSON
+    jsonBody = json.dumps(body, ensure_ascii=False).encode('utf8')
+
+    # Выполнение запроса
+    try:
+        result = requests.post(CampaignsURL, jsonBody, headers=headers)
+
+        # Обработка запроса
+        if result.status_code != 200 or result.json().get("error", False):
+            print("Произошла ошибка при обращении к серверу API Директа.")
+            print("Код ошибки: {}".format(result.json()["error"]["error_code"]))
+            print("Описание ошибки: {}".format(u(result.json()["error"]["error_detail"])))
+            print("RequestId: {}".format(result.headers.get("RequestId", False)))
+        else:
+
+            # Put all keywords in 1 list
+            for campaign in result.json()["result"]["Keywords"]:
+                kw_list.append(campaign['Keyword'])
+
+               # Вывод списка кампаний
+    #            print("Keyword: {}, status {}, State {}, AdGroupId {}, CampaignId {}, Bid {}".format(
+    #                campaign['Keyword'], campaign['Status'], campaign['State'],
+    #                campaign['AdGroupId'], campaign["CampaignId"], campaign['Bid'],
+    #            ))
+
+            if result.json()['result'].get('LimitedBy', False):
+                # Если ответ содержит параметр LimitedBy, значит,  были получены не все доступные объекты.
+                # В этом случае следует выполнить дополнительные запросы для получения всех объектов.
+                # Подробное описание постраничной выборки - https://tech.yandex.ru/direct/doc/dg/best-practice/get-docpage/#page
+                LimitedBy = result.json()['result']['LimitedBy']
+             #   print ("Limit ", LimitedBy)
+                return get_kw_list(LimitedBy, kw_list)
+                print("Получены не все доступные объекты.")
+            print("Amount: ", len(kw_list))
+            print("Without doubles ", len(set(kw_list)))
+
+
+    # Обработка ошибки, если не удалось соединиться с сервером API Директа
+    except ConnectionError:
+        # В данном случае мы рекомендуем повторить запрос позднее
+        print("Произошла ошибка соединения с сервером API.")
+
+    # Если возникла какая-либо другая ошибка
+    except:
+        # В данном случае мы рекомендуем проанализировать действия приложения
+        print("Произошла непредвиденная ошибка.")
+
+if __name__ == '__main__':
+    get_kw_list()
