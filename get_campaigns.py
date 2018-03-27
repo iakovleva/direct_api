@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import requests, json
 from requests.exceptions import ConnectionError
-from tokens import *
+import tokens
 
 #  Метод для корректной обработки строк в кодировке UTF-8 как в Python 3, так и в Python 2
 import sys
@@ -23,29 +23,35 @@ else:
 #  Адрес сервиса Campaigns для отправки JSON-запросов (регистрозависимый)
 
 CampaignsURL = 'https://api-sandbox.direct.yandex.com/json/v5/campaigns'
-# CampaignsURL = 'https://api.direct.yandex.com/json/v5/campaigns'
+#CampaignsURL = 'https://api.direct.yandex.com/json/v5/campaigns'
 
 # --- Подготовка, выполнение и обработка запроса ---
 #  Создание HTTP-заголовков запроса
-headers = {"Authorization": "Bearer " + token,  # OAuth-токен. Использование слова Bearer обязательно
+headers = {"Authorization": "Bearer " + tokens.token,  # OAuth-токен. Использование слова Bearer обязательно
            "Accept-Language": "ru",  # Язык ответных сообщений
            }
 
 # Создание тела запроса
 body = {"method": "get",  # Используемый метод.
-        "params": {"SelectionCriteria": {
-                        "Types": [( "TEXT_CAMPAIGN" ),],
-                   },
-                   "FieldNames": ["Id",
-                                  "Name",
-                                  "StartDate",
-                                  "State",
-                                  "Status",
-                                  "StatusPayment",
-                                #  "Funds",
-                                ],
-                   "TextCampaignFieldNames": [("BiddingStrategy" ),],
-                   }}
+        "params": {
+            "SelectionCriteria": {
+               "Types": [( "TEXT_CAMPAIGN" ),],
+                },
+             "FieldNames": ["Id",
+                            "NegativeKeywords",
+                            "TimeTargeting",
+                            "Name",
+                            #  "StartDate",
+                            #  "State",
+                            #  "Status",
+                            #  "StatusPayment",
+                            #  "Funds",
+                            ],
+             "TextCampaignFieldNames": ["BiddingStrategy",
+                                        "Settings",
+                                        "CounterIds",
+                                       ],
+       }}
 
 # Кодирование тела запроса в JSON
 jsonBody = json.dumps(body, ensure_ascii=False).encode('utf8')
@@ -72,15 +78,18 @@ try:
         print("Информация о баллах: {}".format(result.headers.get("Units", False)))
         # Вывод списка кампаний
         for campaign in result.json()["result"]["Campaigns"]:
-            print("Рекламная кампания: {} №{}, active from {}, state {}, status {}, StatusPayment {}, {}".format(
-                u(campaign['Name']),
-                campaign['Id'],
-                campaign['StartDate'],
-                campaign['State'],
-                campaign['Status'],
-                campaign['StatusPayment'],
-                campaign['TextCampaign']['BiddingStrategy'],
-              #  campaign['Funds'],
+            print("{}: {},".format(
+                 campaign['Id'],
+                 u(campaign['Name']),
+                 campaign['NegativeKeywords'],
+                 campaign['TimeTargeting'],
+                 campaign['TextCampaign']['BiddingStrategy'],
+                 campaign['TextCampaign']['Settings'],
+                 campaign['TextCampaign']['CounterIds'],
+#                campaign['StartDate'],
+#                campaign['State'],
+#                campaign['Status'],
+#                campaign['StatusPayment'],
             ))
 
         if result.json()['result'].get('LimitedBy', False):
