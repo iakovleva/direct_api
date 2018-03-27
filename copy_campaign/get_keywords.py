@@ -40,7 +40,7 @@ def get_kw_list(adgroup, LimitedBy=0, kw_list=[]):
                             "AdGroupIds": [adgroup,]
                             },
                        "FieldNames": [
-                            "Id", "Keyword", "Status", "State", "AdGroupId", "CampaignId", "Bid",
+                            "Id", "Keyword", "AdGroupId", "CampaignId",
                             ],  # Имена параметров, которые требуется получить.
                         "Page": {
     #                       "Limit": (long),
