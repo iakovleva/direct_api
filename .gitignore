@@ -1,5 +1,6 @@
 tokens.py
-curl.json
+*.json
+*.xls
 
 *.pyc
 *.pyo
