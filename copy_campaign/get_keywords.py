@@ -1,10 +1,10 @@
-# -*- coding: utf-8 -*-
-import requests, json
+import requests
+import json
+import tokens
 from requests.exceptions import ConnectionError
 
-import tokens
-
-#  Метод для корректной обработки строк в кодировке UTF-8 как в Python 3, так и в Python 2
+#  Метод для корректной обработки строк в кодировке UTF-8 как в Python 3,
+# так и в Python 2
 import sys
 
 if sys.version_info < (3,):
@@ -20,32 +20,29 @@ else:
         else:
             return x
 
+
 def get_kw_list(adgroup, LimitedBy=0, kw_list=[]):
 
     # --- Входные данные ---
     #  Адрес сервиса Keywords для отправки JSON-запросов (регистрозависимый)
- #   CampaignsURL = 'https://api-sandbox.direct.yandex.com/json/v5/keywords'
     CampaignsURL = 'https://api.direct.yandex.com/json/v5/keywords'
 
     # --- Подготовка, выполнение и обработка запроса ---
     #  Создание HTTP-заголовков запроса
-    headers = {"Authorization": "Bearer " + tokens.token,  # OAuth-токен. Использование слова Bearer обязательно
-               "Accept-Language": "ru",  # Язык ответных сообщений
-               }
+    headers = {"Authorization": "Bearer " + tokens.token,
+               "Accept-Language": "ru"}
 
     # Создание тела запроса
-    body = {"method": "get",  # Используемый метод.
-            "params": {"SelectionCriteria": {
-#                            "CampaignIds": (campaign_ids),
-                            "AdGroupIds": [adgroup,]
-                            },
-                       "FieldNames": [
-                            "Id", "Keyword", "AdGroupId", "CampaignId",
-                            ],  # Имена параметров, которые требуется получить.
-                        "Page": {
-    #                       "Limit": (long),
-                            "Offset": (LimitedBy)
-                        }
+    body = {
+        "method": "get",  # Используемый метод.
+        "params": {
+            "SelectionCriteria": {
+                "AdGroupIds": [adgroup, ]
+                },
+            "FieldNames": ["Id", "Keyword", "AdGroupId", "CampaignId", ],
+            "Page": {
+                "Offset": (LimitedBy)
+                }
           },
     }
 
@@ -59,9 +56,12 @@ def get_kw_list(adgroup, LimitedBy=0, kw_list=[]):
         # Обработка запроса
         if result.status_code != 200 or result.json().get("error", False):
             print("Произошла ошибка при обращении к серверу API Директа.")
-            print("Код ошибки: {}".format(result.json()["error"]["error_code"]))
-            print("Описание ошибки: {}".format(u(result.json()["error"]["error_detail"])))
-            print("RequestId: {}".format(result.headers.get("RequestId", False)))
+            print("Код ошибки: {}".format(
+                  result.json()["error"]["error_code"]))
+            print("Описание ошибки: {}".format(
+                  u(result.json()["error"]["error_detail"])))
+            print("RequestId: {}".format(
+                  result.headers.get("RequestId", False)))
         else:
 
             for campaign in result.json()["result"]["Keywords"]:
@@ -69,14 +69,12 @@ def get_kw_list(adgroup, LimitedBy=0, kw_list=[]):
             return kw_list
 
             if result.json()['result'].get('LimitedBy', False):
-                    # Если ответ содержит параметр LimitedBy, значит,  были получены не все доступные объекты.
-                    # В этом случае следует выполнить дополнительные запросы для получения всех объектов.
-                    # Подробное описание постраничной выборки - https://tech.yandex.ru/direct/doc/dg/best-practice/get-docpage/#page
-                 LimitedBy = result.json()['result']['LimitedBy']
-                 #   print ("Limit ", LimitedBy)
-                 return get_kw_list(LimitedBy, kw_list)
-                 print("Получены не все доступные объекты.")
-
+                # Если ответ содержит параметр LimitedBy, значит,
+                # были получены не все доступные объекты.
+                # В этом случае следует выполнить дополнительные запросы
+                LimitedBy = result.json()['result']['LimitedBy']
+                return get_kw_list(LimitedBy, kw_list)
+                print("Получены не все доступные объекты.")
 
     # Обработка ошибки, если не удалось соединиться с сервером API Директа
     except ConnectionError:
@@ -87,6 +85,7 @@ def get_kw_list(adgroup, LimitedBy=0, kw_list=[]):
     except:
         # В данном случае мы рекомендуем проанализировать действия приложения
         print("Произошла непредвиденная ошибка.")
+
 
 if __name__ == '__main__':
     get_kw_list(sys.argv[1])

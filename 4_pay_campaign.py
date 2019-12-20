@@ -1,7 +1,7 @@
 import json
 import tokens
-from urllib.request import urlopen
 import hashlib
+from urllib.request import urlopen
 
 url = 'https://api-sandbox.direct.yandex.com/v4/json/'
 

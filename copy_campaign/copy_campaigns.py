@@ -11,11 +11,11 @@ adgroup_list = get_adgroups.get_adgroups(campaign_ids)
 for adgroup in adgroup_list:
 
     adgroup_name = str(adgroup[0]) + "_new"
-    new_adgroup_id = add_adgroup.add_adgroup(new_campaign_id, adgroup_name, adgroup[1])
+    new_adgroup_id = add_adgroup.add_adgroup(
+        new_campaign_id, adgroup_name, adgroup[1]
+        )
     kw_list = get_keywords.get_kw_list(adgroup[0], kw_list=[])
 
 # Add keywords in copied groups
     for kw in kw_list:
         add_keyword.add_keyword(kw, new_adgroup_id)
-
-# get_campaigns.get_campaigns()
