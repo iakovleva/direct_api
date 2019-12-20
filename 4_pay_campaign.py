@@ -1,19 +1,20 @@
 import json
+import tokens
 from urllib.request import urlopen
-from tokens import *
-
 import hashlib
 
 url = 'https://api-sandbox.direct.yandex.com/v4/json/'
 
 operationNum = 121
-usedMethod   = 'PayCampaigns'
+usedMethod = 'PayCampaigns'
 
-financeToken = hashlib.sha256((masterToken + str(operationNum) + usedMethod + login).encode('utf8')).hexdigest()
+financeToken = hashlib.sha256((tokens.masterToken + str(operationNum) +
+                               usedMethod +
+                               tokens.login).encode('utf8')).hexdigest()
 
 data = {
    'method': 'PayCampaigns',
-   'token': token,
+   'token': tokens.token,
    'finance_token': financeToken,
    'operation_num': operationNum,
    'locale': 'ru',
@@ -31,7 +32,7 @@ data = {
 # Кодирование тела запроса в JSON
 jdata = json.dumps(data, ensure_ascii=False).encode('utf8')
 
-response = urlopen(url,jdata)
+response = urlopen(url, jdata)
 
-#вывести результат
-print (response.read().decode('utf8'))
+# вывести результат
+print(response.read().decode('utf8'))

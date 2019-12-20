@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
-import requests, json
-from tokens import *
+import requests
+import json
+import tokens
 
-#  Метод для корректной обработки строк в кодировке UTF-8 как в Python 3, так и в Python 2
+#  Метод для корректной обработки строк в кодировке UTF-8 как в Python 3,
+# так и в Python 2
 import sys
 
 if sys.version_info < (3,):
@@ -13,7 +14,7 @@ if sys.version_info < (3,):
             return x
 else:
     def u(x):
-        if type(x) == type(b''):
+        if isinstance(x, b''):
             return x.decode('utf8')
         else:
             return x
@@ -27,7 +28,7 @@ adGroupId = 2901305
 
 # --- Подготовка, выполнение и обработка запроса ---
 #  Создание HTTP-заголовков запроса
-headers = {"Authorization": "Bearer " + token,  # OAuth-токен. Использование слова Bearer обязательно
+headers = {"Authorization": "Bearer " + tokens.token,
            "Accept-Language": "ru",  # Язык ответных сообщений
            }
 
@@ -44,7 +45,7 @@ body = {"method": "add",  # Используемый метод.
                 }
             }]
         }
-    }
+        }
 
 # Кодирование тела запроса в JSON
 jsonBody = json.dumps(body, ensure_ascii=False).encode('utf8')
@@ -64,23 +65,23 @@ try:
     if result.status_code != 200 or result.json().get("error", False):
         print("Произошла ошибка при обращении к серверу API Директа.")
         print("Код ошибки: {}".format(result.json()["error"]["error_code"]))
-        print("Описание ошибки: {}".format(u(result.json()["error"]["error_detail"])))
+        print("Описание ошибки: {}".format(u(result.json()["error"]
+                                                          ["error_detail"])))
         print("RequestId: {}".format(result.headers.get("RequestId", False)))
     else:
-#        print("RequestId: {}".format(result.headers.get("RequestId", False)))
-#        print("Информация о баллах: {}".format(result.headers.get("Units", False)))
-        # Обработка всех элементов массива AddResults, где каждый элемент соотвествует одному объявлению
+        # Обработка всех элементов массива AddResults, где каждый элемент
+        # соотвествует одному объявлению
         for add in result.json()["result"]["AddResults"]:
             if add.get("Errors", False):
-                for  error in add["Errors"]:
+                for error in add["Errors"]:
                     print("Ошибка: {} - {} ({})".format(error["Code"],
-                        u(error["Message"]),u(error["Details"])))
+                          u(error["Message"]), u(error["Details"])))
         else:
             print("Add #{} is created".format(add["Id"]))
             if add.get("Warnings", False):
                 for warning in add["Warnings"]:
                     print("Warning: {} - {} ({})".format(error["Code"],
-                        u(error["Message"]),u(error["Details"])))
+                          u(error["Message"]), u(error["Details"])))
 
 # Обработка ошибки, если не удалось соединиться с сервером API Директа
 except ConnectionError:
