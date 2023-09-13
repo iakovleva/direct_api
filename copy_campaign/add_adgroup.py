@@ -2,23 +2,6 @@ import requests
 import json
 import tokens
 
-#  Метод для корректной обработки строк в кодировке UTF-8 как в Python 3,
-# так и в Python 2
-import sys
-
-if sys.version_info < (3,):
-    def u(x):
-        try:
-            return x.encode("utf8")
-        except UnicodeDecodeError:
-            return x
-else:
-    def u(x):
-        if type(x) == type(b''):
-            return x.decode('utf8')
-        else:
-            return x
-
 
 def add_adgroup(new_campaign_id, adgroup_name, regions):
 
