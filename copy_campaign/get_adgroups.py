@@ -16,8 +16,13 @@ def get_adgroups(campaign_ids):
     }
     method = 'get'
     
-    send_request(CampaignsURL, method, params)
+    result = send_request(CampaignsURL, method, params)
+    adgroup_list = []
 
+    for campaign in result["AdGroups"]:
+       adgroup_list.append((campaign['Id'], campaign['RegionIds']))
+    print(adgroup_list)
+    
 
 if __name__ == "__main__":
     get_adgroups(sys.argv[1])

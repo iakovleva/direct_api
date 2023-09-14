@@ -18,7 +18,6 @@ def send_request(url: str, method: str, params: dict):
 
     try:
         result = requests.post(url, jsonBody, headers=headers)
-        adgroup_list = []
 
         if result.status_code != 200 or result.json().get("error", False):
             print("Произошла ошибка при обращении к серверу API Директа.", 
@@ -26,9 +25,7 @@ def send_request(url: str, method: str, params: dict):
             print(f"Код ошибки: {result.json()['error']['error_code']}")
             print(f"RequestId: {result.headers.get('RequestId', False)}")
         else:
-            for campaign in result.json()["result"]["AdGroups"]:
-                adgroup_list.append((campaign['Id'], campaign['RegionIds']))
-            print(adgroup_list)
+            return result.json()["result"]
 
             if result.json()['result'].get('LimitedBy', False):
                 # В этом случае следует выполнить дополнительные запросы
