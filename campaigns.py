@@ -1,4 +1,3 @@
-import sys
 from send_request import send_request
 
 
@@ -38,7 +37,7 @@ def get_campaigns():
     for campaign in result["Campaigns"]:
         print("{}: {},".format(
              campaign['Id'],
-             u(campaign['Name']),
+             campaign['Name'],
              campaign['NegativeKeywords'],
              campaign['TimeTargeting'],
              campaign['TextCampaign']['BiddingStrategy'],
@@ -53,11 +52,7 @@ def update_campaigns():
     result = send_request(CampaignsURL, method, params)
 
     for res in result["UpdateResults"]:
-        print("Campaign #{} is updated".format(res["Id"]))
+        print(f"Campaign #{res["Id"]} is updated")
         if res.get("Warnings", False):
             for warning in res["Warnings"]:
-                print("Warning: {} - {} ({})".format(error["Code"], error["Message"], error["Details"]))
-
-
-if __name__ == "__main__":
-    get_campaigns()
+                print(f"Warning: {error["Code"]} - {error["Message"]} ({error["Details"]})") 

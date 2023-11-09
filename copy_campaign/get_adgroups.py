@@ -1,8 +1,5 @@
 import sys
-import requests
-import json
 from send_request import send_request
-from requests.exceptions import ConnectionError
 
 
 def get_adgroups(campaign_ids):
