@@ -1,49 +1,34 @@
 from send_request import send_request
 
 
-CampaignsURL = 'https://api-sandbox.direct.yandex.com/json/v5/keywords'
+url_part = 'keywords'
 
-LimitedBy = 10000
-
-get_params = {
-    "SelectionCriteria": {
-        "CampaignIds":[""],
-        },
-   "FieldNames": [
-        "Id", "Keyword", "AdGroupId", "CampaignId", "Status", "State", "Bid",
-        ],  # Имена параметров, которые требуется получить.
-    "Page": {
-       "Limit": (long),
-        "Offset": (LimitedBy)
-    }
-}
   
-delete_params = {
-    "Selectioncriteria": {
-        "Ids": ["", "",]
-    },
-}
 
 
-def get_ad():
-    method = 'get'
-    params = get_params
-    result = send_request(CampaignsURL, method, params)
+def get_ad(campaign_ids: list):
+    LimitedBy = 10000
+ 
+    # Имена параметров, которые требуется получить.
+    field_names = ["Id", "Keyword", "AdGroupId", "CampaignId", "Status", "State", "Bid"]
+    
+    get_params = {
+        "SelectionCriteria": {
+            "CampaignIds": campaign_ids,
+            },
+       "FieldNames": field_names, 
+        "Page": {
+           # "Limit": (long),
+           "Offset": LimitedBy
+        }
+    }
+    get(url_part, get_params, field_names)
 
-    for campaign in result.json()["result"]["Keywords"]:
-        print(campaign['Keyword'],
-              campaign['CampaignId'],
-              campaign['AdGroupId'],
-              campaign['Status'],
-              campaign['State'],
-              campaign['Bid']
-        )
 
-
-def delete_ad():
-    method = 'delete'
-    params = delete_params
-    result = send_request(CampaignsURL, method, params)
-
-    for campaign in result.json()["result"]["DeleteResults"]:
-        print(f"Keyword: {campaign['Id']} deleted")
+def delete_ad(ads_ids: list):
+    delete_params = {
+        "Selectioncriteria": {
+            "Ids": ads_ids, 
+        }
+    }
+    delete(url_part, delete_params)

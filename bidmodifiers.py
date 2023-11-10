@@ -2,7 +2,7 @@ from send_request import send_request
 from regions_dict import REGIONS_DICT
 
 
-CampaignsURL = 'https://api.direct.yandex.com/json/v5/bidmodifiers'
+url_part = 'bidmodifiers'
 
 
 def get_bidmodifiers(campaign_ids, region):
@@ -32,7 +32,7 @@ def get_bidmodifiers(campaign_ids, region):
         }
         method = 'get'
         
-        result = send_request(CampaignsURL, method, params)
+        result = send_request(url_part, method, params)
         bids_list = []
         for res in result['BidModifiers']:
             if res['RegionalAdjustment']['RegionId'] == region_id:
@@ -54,5 +54,5 @@ def add_bidmodifiers(campaign_id, region_id, bid_modifier):
       ]
     }
     method = "add"
-    result = send_request(CampaignsURL, method, params)
+    result = send_request(url_part, method, params)
     print(result)

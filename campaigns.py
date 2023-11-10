@@ -1,58 +1,39 @@
 from send_request import send_request
 
 
-CampaignsURL = 'https://api-sandbox.direct.yandex.com/json/v5/campaigns'
-get_params = {
-    "SelectionCriteria": {
-        "Types": [("TEXT_CAMPAIGN"), ],
-        },
-    "FieldNames": [
-        "Id",
-        "NegativeKeywords",
-        "TimeTargeting",
-        "Name",
-        ],
-    "TextCampaignFieldNames": [
-        "BiddingStrategy",
-        "Settings",
-        "CounterIds",
-        ],
-}
-
-# Update StartDate
-update_params = {
-    "Campaigns":[{
-        "Id": "",
-        "StartDate": ""   # 2018-03-07
-    }]
-}
-
+url_part = 'campaigns'
 
 def get_campaigns():
-    method = 'get'
-    params = get_params
-    result = send_request(CampaignsURL, method, params)
+    field_names = [
+            "Id",
+            "NegativeKeywords",
+            "TimeTargeting",
+            "Name",
+            ],
+    get_params = {
+        "SelectionCriteria": {
+            "Types": [("TEXT_CAMPAIGN"), ],
+            },
+        "FieldNames": field_names, 
+        "TextCampaignFieldNames": [
+            "BiddingStrategy",
+            "Settings",
+            "CounterIds",
+            ],
+    }
 
-    # Вывод списка кампаний
-    for campaign in result["Campaigns"]:
-        print("{}: {},".format(
-             campaign['Id'],
-             campaign['Name'],
-             campaign['NegativeKeywords'],
-             campaign['TimeTargeting'],
-             campaign['TextCampaign']['BiddingStrategy'],
-             campaign['TextCampaign']['Settings'],
-             campaign['TextCampaign']['CounterIds'],
-        ))
+    get(url_part, get_params, field_names)
+    # TODO add folded fieldnames in get() method
+    #          campaign['TextCampaign']['BiddingStrategy'],
+    #          campaign['TextCampaign']['Settings'],
+    #          campaign['TextCampaign']['CounterIds'],
 
 
-def update_campaigns():
-    method = 'update'
-    params = update_params
-    result = send_request(CampaignsURL, method, params)
-
-    for res in result["UpdateResults"]:
-        print(f"Campaign #{res["Id"]} is updated")
-        if res.get("Warnings", False):
-            for warning in res["Warnings"]:
-                print(f"Warning: {error["Code"]} - {error["Message"]} ({error["Details"]})") 
+def update_campaigns(campaign_id: str , start_date: str):
+    update_params = {
+        "Campaigns":[{
+            "Id": campaign_id,
+            "StartDate": start_date   # 2018-03-07
+        }]
+    }
+    update(url_part, update_params)
