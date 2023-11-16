@@ -5,7 +5,7 @@ from helpers.regions_dict import REGIONS_DICT
 url_part = 'bidmodifiers'
 
 
-def get_bidmodifiers(campaign_ids, region):
+def get_bidmodifiers(campaign_ids: list, region: str):
     if region in REGIONS_DICT.keys():
         region_id = REGIONS_DICT[region]
         print(f'Region_id: {region_id}')
@@ -15,9 +15,7 @@ def get_bidmodifiers(campaign_ids, region):
     if region_id:
         params = {
             "SelectionCriteria": {
-                "CampaignIds": [
-                    campaign_ids
-                ],
+                "CampaignIds": campaign_ids,
                 "Types": [
                     "REGIONAL_ADJUSTMENT"
                 ],
@@ -38,11 +36,11 @@ def get_bidmodifiers(campaign_ids, region):
         for res in result['BidModifiers']:
             if res['RegionalAdjustment']['RegionId'] == region_id:
                 bids_list.append(res['Id'])
-        print(bids_list)
+        return bids_list
 
 
 def add_bidmodifiers(campaign_id, region_id, bid_modifier):
-    params = {
+    add_params = {
         "BidModifiers": [
             {
                 "CampaignId": campaign_id,
@@ -53,6 +51,4 @@ def add_bidmodifiers(campaign_id, region_id, bid_modifier):
             }
         ]
     }
-    method = "add"
-    result = send_request(url_part, method, params)
-    print(result)
+    return add(url_part, add_params)

@@ -23,7 +23,7 @@ def get_campaigns():
         ],
     }
 
-    get(url_part, get_params, field_names)
+    return get(url_part, get_params, field_names)
     # TODO add folded fieldnames in get() method
     #    campaign['TextCampaign']['BiddingStrategy'],
     #    campaign['TextCampaign']['Settings'],
@@ -37,4 +37,4 @@ def update_campaigns(campaign_id: str, start_date: str):
             "StartDate": start_date   # 2018-03-07
         }]
     }
-    update(url_part, update_params)
+    return update(url_part, update_params)

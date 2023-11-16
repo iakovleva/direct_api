@@ -82,6 +82,25 @@ def get(url_part, params, field_names):
     result = send_request(url_part, 'get', params)
     instance = url_part.capitalize()
 
-    for res in result[instance]:
-        for field in field_names:
-            print(res[field])
+    # for res in result[instance]:
+    #    for field in field_names:
+    #        print(res[field])
+    try:
+        return result[instance]
+    except KeyError:
+        return None
+
+
+def add(url_part, params):
+    result = send_request(url_part, 'add', params)
+    instance = get_instance_name_from_url(url_part)
+
+    for res in result["AddResults"]:
+        if res.get("Errors", False):
+            for error in res["Errors"]:
+                print(f'Ошибка: {error["Code"]} - {error["Message"]} ({error["Details"]})')
+        else:
+            print(f'{instance} #{res["Id"]} is created')
+            if res.get("Warnings", False):
+                for warning in res["Warnings"]:
+                    print(f'Warning: {error["Code"]} - {error["Message"]} ({error["Details"]})')

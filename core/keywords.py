@@ -1,9 +1,9 @@
-from send_request import get, delete
+from core.send_request import get, delete
 
 url_part = 'keywords'
 
 
-def get_ad(campaign_ids: list):
+def get_keywords(campaign_ids: list):
     LimitedBy = 10000
 
     # Имена параметров, которые требуется получить.
@@ -15,18 +15,18 @@ def get_ad(campaign_ids: list):
         },
         "FieldNames": field_names,
         "Page": {
-            # "Limit": (long),
-            "Offset": LimitedBy
+            "Limit": LimitedBy,
+        #    "Offset": LimitedBy
         }
     }
-    get(url_part, get_params, field_names)
+    return get(url_part, get_params, field_names)
 
 
-def delete_ad(ads_ids: list):
+def delete_keywords(ads_ids: list):
     delete_params = {
         "Selectioncriteria": {
             "Ids": ads_ids,
         }
     }
 
-    delete(url_part, delete_params)
+    return delete(url_part, delete_params)
